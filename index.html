@@ -1,0 +1,838 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Tienda MANU</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&family=Inter:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap">
+<style>
+/* Layout: página de un solo producto — wordmark rojo con la silla encima, asiento reciclado primero, banda oscura de colores, compra, ficha técnica tipo lámina, caja y envío */
+:root{
+  --bg:#F4F3F1; --surface:#FFFFFF; --surface-2:#F8F7F5; --fg:#1C1617; --muted:#776C6B; --line:#E6E0DE;
+  --red:#D8352A; --red-ink:#B8261D; --red-soft:#FBE4E0; --on-red:#FFFFFF;
+  --ink:#1C1617; --ink-2:#2B2223; --on-ink:#F5EFEE; --on-ink-muted:#A89A99;
+  --sheet:#FFFFFF; --sheet-fg:#1C1617; --sheet-muted:#776C6B; --sheet-accent:#B8261D; --sheet-line:#E3DDDA;
+  --photo:#FFFFFF;
+  --ok:#1F8A55; --shadow:0 10px 30px rgba(40,10,10,.08);
+  --f-display:"Outfit", "Helvetica Neue", Arial, sans-serif;
+  --f-body:"Inter", system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+  --f-mono:"IBM Plex Mono", ui-monospace, "SFMono-Regular", Menlo, monospace;
+  color-scheme:light;
+}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]){
+  --bg:#131011; --surface:#1D1819; --surface-2:#241E1F; --fg:#F2ECEB; --muted:#A99C9B; --line:#352C2D;
+  --red:#D8352A; --red-ink:#F2685D; --red-soft:#3A1A18; --ink:#0B0909; --ink-2:#1F1819; --on-ink:#F5EFEE; --on-ink-muted:#A89A99;
+  --sheet:#EDEAE7; --sheet-fg:#1C1617; --sheet-muted:#6E6463;
+  --ok:#46C384; --shadow:0 10px 30px rgba(0,0,0,.4); color-scheme:dark}}
+:root[data-theme="dark"]{
+  --bg:#131011; --surface:#1D1819; --surface-2:#241E1F; --fg:#F2ECEB; --muted:#A99C9B; --line:#352C2D;
+  --red:#D8352A; --red-ink:#F2685D; --red-soft:#3A1A18; --ink:#0B0909; --ink-2:#1F1819; --on-ink:#F5EFEE; --on-ink-muted:#A89A99;
+  --sheet:#EDEAE7; --sheet-fg:#1C1617; --sheet-muted:#6E6463;
+  --ok:#46C384; --shadow:0 10px 30px rgba(0,0,0,.4); color-scheme:dark}
+
+*{box-sizing:border-box}
+html{scroll-behavior:smooth}
+body{margin:0;background:var(--bg);color:var(--fg);font-family:var(--f-body);font-size:15px;line-height:1.55;-webkit-font-smoothing:antialiased;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
+body::before{content:"";position:fixed;inset:0 0 auto;height:env(safe-area-inset-top,0px);z-index:30;background:var(--bg)}
+img{max-width:100%}
+[hidden]{display:none!important}
+a{color:inherit;text-decoration:none}
+button,input,select,textarea{font:inherit;color:inherit}
+button{cursor:pointer}
+:focus-visible{outline:2px solid var(--red);outline-offset:3px;border-radius:8px}
+h1,h2,h3,h4{font-family:var(--f-display);text-wrap:balance;margin:0;letter-spacing:-.01em}
+p,ul{margin:0}
+.wrap{max-width:1200px;margin:0 auto;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px))}
+.num{font-variant-numeric:tabular-nums}
+.muted{color:var(--muted)}
+.ok{color:var(--ok)}
+.mono{font-family:var(--f-mono);font-size:11.5px;letter-spacing:.06em;text-transform:uppercase}
+
+/* Botones */
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:8px;height:46px;padding:0 26px;border-radius:999px;border:1px solid transparent;background:var(--red);color:var(--on-red);font-weight:600;font-size:15px;transition:filter .15s,background .15s;white-space:nowrap}
+.btn:hover{filter:brightness(.93)}
+.btn.dark{background:var(--fg);color:var(--bg)}
+.btn.ghost{background:transparent;border-color:var(--fg);color:var(--fg)}
+.btn.ghost:hover{background:var(--fg);color:var(--bg);filter:none}
+.btn.sm{height:36px;padding:0 18px;font-size:13.5px}
+.btn.block{width:100%}
+.link{border:0;background:none;padding:0;color:var(--red-ink);font-weight:500}
+.link:hover{text-decoration:underline}
+
+/* Encabezado */
+.top{position:sticky;top:env(safe-area-inset-top,0px);z-index:20;background:var(--bg);border-bottom:1px solid transparent;transition:border-color .2s}
+.top.scrolled{border-bottom-color:var(--line)}
+.top-in{display:flex;align-items:center;gap:20px;min-height:68px}
+.logo{font-family:var(--f-display);font-weight:700;font-size:27px;letter-spacing:-.04em;line-height:1;display:flex;align-items:baseline}
+.logo i{display:inline-block;width:8px;height:8px;border-radius:50%;background:var(--red);margin-left:2px}
+.nav{display:flex;gap:32px;margin:0 auto;font-size:14px;font-weight:500}
+.nav a{padding:6px 0;border-bottom:1.5px solid transparent;white-space:nowrap}
+.nav a:hover{border-bottom-color:var(--fg)}
+.nav a.on{border-bottom-color:var(--red);color:var(--red-ink)}
+.top-actions{display:flex;gap:10px;align-items:center}
+.cart{position:relative;width:42px;height:42px;border-radius:13px;background:var(--fg);color:var(--bg);display:grid;place-items:center;flex:none}
+.cart b{position:absolute;top:-6px;right:-6px;min-width:20px;height:20px;padding:0 5px;border-radius:10px;background:var(--red);color:var(--on-red);font-size:11.5px;display:grid;place-items:center;font-variant-numeric:tabular-nums;border:2px solid var(--bg)}
+@media (max-width:820px){
+  .top-in{flex-wrap:wrap;gap:0 12px;padding-top:10px}
+  .logo{margin-right:auto}
+  .nav{order:3;width:100%;margin:0;gap:22px;overflow-x:auto;scrollbar-width:none;padding-block:8px 6px}
+  .nav::-webkit-scrollbar{display:none}
+}
+
+main{min-height:60vh}
+section[id]{scroll-margin-top:84px}
+@media (max-width:820px){section[id]{scroll-margin-top:118px}}
+
+/* Hero */
+.hero{padding-block:24px 56px}
+.word{display:flex;flex-direction:column;font-weight:600;color:var(--red);line-height:.8;margin:0}
+.word span{font-size:clamp(108px,29vw,380px);letter-spacing:-.065em;margin-left:-.04em}
+.word small{align-self:flex-end;font-size:clamp(17px,2.2vw,26px);font-weight:400;letter-spacing:-.01em;color:var(--fg);line-height:1.2;margin-top:clamp(-56px,-3.6vw,-14px);position:relative;z-index:1}
+.hero-grid{margin-top:24px;display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1.25fr) minmax(0,1fr);gap:24px;align-items:end}
+.hero-chair{position:relative;z-index:2;margin-top:clamp(-150px,-10.5vw,-40px);display:flex;justify-content:center}
+.hero-chair img{width:100%;max-width:520px;height:auto;aspect-ratio:1/1;object-fit:contain;display:block}
+.hero-copy{display:flex;flex-direction:column;gap:18px;align-items:flex-start;padding-bottom:24px}
+.hero-copy p{max-width:36ch;color:var(--muted);font-size:14.5px}
+.hero-price{display:flex;flex-direction:column;gap:2px}
+.hero-price b{font-family:var(--f-display);font-size:36px;font-weight:500;letter-spacing:-.02em;line-height:1;font-variant-numeric:tabular-nums}
+.hero-price span{font-size:13px;color:var(--muted)}
+.hero-btns{display:flex;gap:10px;flex-wrap:wrap}
+.hero-cards{display:grid;grid-template-columns:1fr 1fr;gap:14px;padding-bottom:24px}
+.hcard{background:var(--ink);color:var(--on-ink);border-radius:22px;padding:7px 7px 12px;display:flex;flex-direction:column;gap:10px;transition:transform .2s}
+.hcard:hover{transform:translateY(-3px)}
+.hcard img{border-radius:16px;aspect-ratio:1/1;object-fit:contain;background:var(--photo);width:100%;display:block}
+.hcard span{font-size:13.5px;font-weight:500;padding-inline:8px}
+@media (max-width:860px){
+  .hero-grid{grid-template-columns:1fr}
+  .hero-chair{margin-top:clamp(-80px,-9vw,-24px)}
+  .hero-chair img{max-width:360px}
+  .hero-copy,.hero-cards{padding-bottom:0}
+}
+
+/* Secciones */
+.sec{padding-block:72px}
+.sec-head{display:flex;justify-content:space-between;align-items:flex-end;gap:16px 24px;flex-wrap:wrap;margin-bottom:28px}
+.sec-head h2{font-size:clamp(28px,3.8vw,44px);font-weight:400;line-height:1.08}
+.sec-head h2 span{display:block;color:var(--muted)}
+.idx{font-family:var(--f-display);font-size:clamp(18px,2vw,22px);color:var(--muted)}
+
+/* Asiento */
+.seat{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:16px;align-items:stretch}
+@media (max-width:860px){.seat{grid-template-columns:1fr}}
+.tile{border-radius:24px;overflow:hidden;display:block;background:var(--photo)}
+.tile img{display:block;width:100%;height:100%;object-fit:contain}
+.seat .tile{aspect-ratio:1/1}
+.seat-side{background:var(--surface);border-radius:24px;padding:32px;display:flex;flex-direction:column;gap:26px;min-width:0}
+@media (max-width:520px){.seat-side{padding:22px}}
+.lead{font-size:17px;line-height:1.5;max-width:52ch}
+.stats{display:grid;grid-template-columns:1fr 1fr;gap:0;border-top:1px solid var(--line)}
+.stat{padding:16px 16px 16px 0;border-bottom:1px solid var(--line);display:flex;flex-direction:column;gap:2px}
+.stat:nth-child(odd){border-right:1px solid var(--line)}
+.stat:nth-child(even){padding-left:18px}
+.stat b{font-family:var(--f-display);font-weight:300;font-size:clamp(34px,4vw,46px);line-height:1;color:var(--red-ink);letter-spacing:-.03em;font-variant-numeric:tabular-nums}
+.stat span{font-size:13px;color:var(--muted)}
+.checks{list-style:none;padding:0;display:flex;flex-direction:column;gap:9px;font-size:14px}
+.checks li{display:flex;gap:10px;align-items:flex-start}
+.checks li::before{content:"";flex:none;width:7px;height:7px;border-radius:50%;background:var(--red);margin-top:8px}
+.note{font-size:12px;color:var(--muted)}
+
+/* Colores */
+.band{background:var(--ink);color:var(--on-ink)}
+.band .sec-head h2 span{color:var(--on-ink-muted);display:inline}
+.band .idx{color:var(--on-ink-muted)}
+.colors{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:14px}
+@media (max-width:900px){.colors{grid-auto-flow:column;grid-template-columns:none;grid-auto-columns:minmax(170px,40%);overflow-x:auto;scroll-snap-type:x mandatory;scrollbar-width:none;padding-bottom:4px}.colors::-webkit-scrollbar{display:none}}
+.ctile{background:var(--surface);color:var(--fg);border:2px solid transparent;border-radius:22px;padding:6px 6px 14px;display:flex;flex-direction:column;gap:4px;text-align:left;scroll-snap-align:start;transition:transform .2s}
+.ctile:hover{transform:translateY(-3px)}
+.ctile.on{border-color:var(--red)}
+.ctile img{border-radius:16px;display:block;width:100%;aspect-ratio:1/1;margin-bottom:8px;object-fit:contain;background:var(--photo)}
+.cname{font-family:var(--f-display);font-size:18px;font-weight:500;padding-inline:8px;display:flex;align-items:center;gap:8px}
+.cname i{width:12px;height:12px;border-radius:50%;box-shadow:inset 0 0 0 1px rgba(0,0,0,.15)}
+.cmeta{font-size:12px;color:var(--muted);padding-inline:8px}
+.ctile.on .cmeta{color:var(--red-ink)}
+.band-note{margin-top:22px;font-size:13.5px;color:var(--on-ink-muted);max-width:62ch}
+
+/* Compra */
+.pdp{display:grid;grid-template-columns:minmax(0,1.15fr) minmax(0,1fr);gap:24px;align-items:start}
+@media (max-width:860px){.pdp{grid-template-columns:1fr}}
+.gal{display:flex;flex-direction:column;gap:10px}
+.main-img{border-radius:24px;overflow:hidden;background:var(--photo)}
+.main-img img{display:block;width:100%;aspect-ratio:1/1;object-fit:contain}
+.thumbs{display:grid;grid-template-columns:repeat(7,minmax(0,1fr));gap:8px}
+@media (max-width:560px){.thumbs{grid-template-columns:repeat(4,minmax(0,1fr))}}
+.thumb{padding:0;border:2px solid transparent;border-radius:14px;overflow:hidden;background:none;position:relative}
+.thumb img{display:block;width:100%;aspect-ratio:1/1;object-fit:contain;background:var(--photo)}
+.thumb.on{border-color:var(--red)}
+.thumb small{position:absolute;left:5px;bottom:4px;font-family:var(--f-mono);font-size:8.5px;letter-spacing:.05em;text-transform:uppercase;color:#5E5455}
+.buy{display:flex;flex-direction:column;gap:18px;min-width:0;background:var(--surface);border-radius:24px;padding:28px}
+@media (max-width:520px){.buy{padding:20px}}
+.buy h2{font-size:clamp(32px,3.8vw,44px);font-weight:400;line-height:1.02;letter-spacing:-.03em}
+.buy .tagline{font-size:14.5px;color:var(--muted);max-width:44ch}
+.bigprice{display:flex;flex-direction:column;gap:2px}
+.bigprice .price{font-family:var(--f-display);font-size:38px;font-weight:500;letter-spacing:-.02em;line-height:1.1;font-variant-numeric:tabular-nums}
+.msi{font-size:13px;color:var(--muted)}
+.opt h4{font-family:var(--f-body);margin:0 0 8px;font-size:13.5px;font-weight:400;color:var(--muted)}
+.opt h4 b{font-weight:600;color:var(--fg)}
+.sw{display:flex;gap:8px;flex-wrap:wrap}
+.sw button{width:38px;height:38px;border-radius:50%;border:2px solid var(--line);padding:3px;background:var(--surface)}
+.sw button i{display:block;width:100%;height:100%;border-radius:50%;box-shadow:inset 0 0 0 1px rgba(0,0,0,.14)}
+.sw button.on{border-color:var(--red)}
+.qtyrow{display:flex;align-items:center;gap:12px;flex-wrap:wrap;font-size:13.5px}
+.step{display:inline-flex;align-items:center;border:1px solid var(--line);border-radius:999px;overflow:hidden;height:40px}
+.step button{width:38px;height:100%;border:0;background:transparent;font-size:18px}
+.step button:disabled{color:var(--line);cursor:default}
+.step span{min-width:28px;text-align:center;font-weight:600;font-variant-numeric:tabular-nums}
+.actions{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+@media (max-width:420px){.actions{grid-template-columns:1fr}}
+.perks{display:flex;flex-direction:column;border-top:1px solid var(--line)}
+.perk{display:flex;gap:12px;align-items:flex-start;padding-block:12px;border-bottom:1px solid var(--line);font-size:13.5px}
+.perk svg{flex:none;margin-top:2px}
+.perk b{display:block;font-weight:600}
+.perk small{display:block;color:var(--muted);font-size:12.5px}
+
+/* Despiece (lámina técnica, siempre clara) */
+.exp{position:relative;background:var(--sheet);color:var(--sheet-fg);border-radius:24px;overflow:hidden;padding:28px 32px 32px}
+.exp-head{display:flex;justify-content:space-between;align-items:baseline;gap:12px;margin-bottom:22px;color:var(--sheet-muted)}
+.exp-head .brandline{font-family:var(--f-display);font-weight:300;font-size:26px;letter-spacing:.08em;text-transform:uppercase;color:var(--sheet-fg)}
+.exp-grid{display:grid;grid-template-columns:220px minmax(0,1fr) minmax(0,1fr);gap:0 28px;align-items:stretch}
+.views{display:flex;flex-direction:column;justify-content:space-between;gap:24px}
+.parts{list-style:none;padding:0;margin:0;display:flex;flex-direction:column}
+.parts li{display:grid;grid-template-columns:26px minmax(0,1fr);gap:8px;padding-block:11px;border-bottom:1px solid var(--sheet-line);font-size:13.5px;line-height:1.35}
+.parts li:first-child{padding-top:0}
+.parts span{font-family:var(--f-mono);font-size:11px;color:var(--sheet-accent);padding-top:2px}
+.parts b{display:block;font-weight:600}
+.parts small{display:block;color:var(--sheet-muted);font-size:12.5px}
+.dims{font-family:var(--f-mono);font-size:11.5px;color:var(--sheet-muted);line-height:1.6}
+.exp-body{border-left:1px solid var(--sheet-fg);padding-left:28px;display:flex;flex-direction:column;justify-content:space-between;gap:28px;padding-block:6px 4px;min-width:0}
+.exp-title{font-weight:300;font-size:clamp(46px,6vw,74px);line-height:.9;letter-spacing:-.03em;margin-left:-.2em;background:linear-gradient(90deg,transparent 0 .2em,var(--sheet) .2em);display:flex;flex-direction:column;align-self:flex-start;padding-right:8px}
+.exp-title small{font-size:.32em;color:var(--sheet-muted);letter-spacing:0;margin-left:2.4em;margin-top:.5em;font-weight:300}
+.callout{border-bottom:1px solid var(--sheet-fg);padding-bottom:10px;font-size:14px;margin-right:-28px}
+.callout span{display:block;max-width:30ch}
+.callout b,.materials b{font-weight:600}
+.materials{font-size:14px}
+.materials b{display:block}
+.exp-big{display:flex;align-items:center;justify-content:center;min-width:0}
+.exp-big img{display:block;width:auto;max-width:100%;max-height:620px;height:auto}
+@media (max-width:960px){
+  .exp-grid{grid-template-columns:200px minmax(0,1fr)}
+  .exp-big{grid-column:1/-1;margin-top:24px}
+  .callout{margin-right:0}
+}
+@media (max-width:640px){
+  .exp{padding:20px}
+  .exp-grid{grid-template-columns:1fr}
+  .views{padding-bottom:20px}
+  .exp-body{border-left:0;border-top:1px solid var(--sheet-fg);padding:20px 0 0}
+  .exp-title{margin-left:0;background:none}
+  .exp-big img{max-height:460px}
+}
+
+/* Ventajas */
+#sec-ventajas{padding-bottom:72px}
+.vgrid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:16px}
+@media (max-width:860px){.vgrid{grid-template-columns:1fr}}
+.vcard{background:var(--surface);border-radius:22px;padding:22px;display:flex;flex-direction:column;gap:8px}
+.vcard .mono{color:var(--red-ink)}
+.vcard h3{font-size:21px;font-weight:500}
+.vcard p{font-size:14px;color:var(--muted)}
+
+/* Características */
+.two{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:16px;align-items:start}
+@media (max-width:860px){.two{grid-template-columns:1fr}}
+.panel{background:var(--surface);border-radius:24px;padding:28px;min-width:0}
+@media (max-width:520px){.panel{padding:20px}}
+.panel h3{font-size:22px;font-weight:500;margin-bottom:16px}
+.feats{list-style:none;padding:0;display:flex;flex-direction:column}
+.feats li{display:grid;grid-template-columns:28px minmax(0,1fr);gap:12px;padding-block:13px;border-bottom:1px solid var(--line);font-size:14px}
+.feats li:last-child{border-bottom:0}
+.feats li span{font-family:var(--f-mono);font-size:11px;color:var(--red-ink);padding-top:3px}
+.feats b{display:block;font-weight:600}
+.feats small{display:block;color:var(--muted);font-size:13.5px}
+.specs{width:100%;border-collapse:collapse;font-size:14px}
+.specs th,.specs td{text-align:left;padding:10px 0;vertical-align:top;border-bottom:1px solid var(--line)}
+.specs th{width:44%;font-weight:400;color:var(--muted);padding-right:16px}
+.specs tr:last-child th,.specs tr:last-child td{border-bottom:0}
+
+/* Caja */
+.box-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:16px}
+@media (max-width:700px){.box-grid{grid-template-columns:1fr}}
+.bitem{background:var(--surface);border-radius:22px;padding:7px 7px 18px;display:flex;flex-direction:column;gap:6px}
+.bitem .bimg{border-radius:16px;background:var(--surface-2);aspect-ratio:4/3;display:grid;place-items:center;overflow:hidden;margin-bottom:8px}
+.bitem .bimg img{width:100%;height:100%;object-fit:cover;display:block}
+.bitem .qty{font-family:var(--f-mono);font-size:11px;color:var(--red-ink);padding-inline:10px;letter-spacing:.05em}
+.bitem b{font-family:var(--f-display);font-size:17px;font-weight:500;padding-inline:10px;line-height:1.2}
+.bitem small{color:var(--muted);font-size:13px;padding-inline:10px}
+.care{margin-top:16px;display:grid;grid-template-columns:minmax(0,1fr) minmax(0,2fr);gap:24px;align-items:start}
+@media (max-width:760px){.care{grid-template-columns:1fr;gap:12px}}
+.care h3{font-size:22px;font-weight:500}
+.care ul{list-style:none;padding:0;display:grid;grid-template-columns:1fr 1fr;gap:10px 24px;font-size:14px}
+@media (max-width:560px){.care ul{grid-template-columns:1fr}}
+.care li{display:flex;gap:10px}
+.care li::before{content:"";flex:none;width:7px;height:7px;border-radius:50%;background:var(--red);margin-top:8px}
+
+/* Nosotros */
+.about{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:16px}
+.about .big{aspect-ratio:1/1.02}
+.about-side{display:flex;flex-direction:column;gap:20px;min-width:0}
+.about-side .tile{aspect-ratio:4/3}
+.quote{font-family:var(--f-display);font-size:clamp(26px,3vw,34px);line-height:1.15;letter-spacing:-.02em;color:var(--red-ink);max-width:22ch}
+.about-side p{max-width:60ch;font-size:14.5px}
+@media (max-width:760px){.about{grid-template-columns:1fr}}
+.team-title{font-size:26px;font-weight:400;margin:48px 0 18px}
+.team{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:16px}
+@media (max-width:760px){.team{grid-template-columns:1fr 1fr}}
+@media (max-width:460px){.team{grid-template-columns:1fr}}
+.member{margin:0;background:var(--surface);border-radius:22px;padding:7px 7px 16px;display:flex;flex-direction:column;gap:12px}
+.photo{aspect-ratio:1/1;border-radius:16px;overflow:hidden;background:var(--surface-2)}
+.photo img{display:block;width:100%;height:100%;object-fit:cover}
+.photo span{font-family:var(--f-display);font-size:56px;font-weight:300;letter-spacing:-.02em;color:var(--red-ink);line-height:1}
+.member figcaption{padding-inline:10px;display:flex;flex-direction:column;gap:2px}
+.member b{font-family:var(--f-display);font-size:19px;font-weight:500;line-height:1.2}
+.member small{color:var(--muted);font-size:13px}
+
+/* Envío */
+.ship-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:14px}
+@media (max-width:860px){.ship-grid{grid-template-columns:1fr}}
+.sopt{background:var(--surface);border-radius:22px;padding:22px;display:flex;flex-direction:column;gap:10px}
+.sopt .mono{color:var(--muted)}
+.sopt h3{font-size:21px;font-weight:500}
+.sopt .cost{font-family:var(--f-display);font-size:34px;font-weight:400;letter-spacing:-.02em;line-height:1;font-variant-numeric:tabular-nums}
+.sopt .cost.free{color:var(--ok)}
+.sopt .time{font-size:14px;font-weight:600}
+.sopt p{font-size:13.5px;color:var(--muted)}
+.estimator{margin-top:16px;display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1.4fr);gap:24px;align-items:center;background:var(--surface);border-radius:22px;padding:22px}
+@media (max-width:760px){.estimator{grid-template-columns:1fr;gap:12px}}
+.estimator h3{font-size:20px;font-weight:500;margin-bottom:10px}
+.cp{display:flex;gap:8px;align-items:center;max-width:320px}
+.cp input{flex:1;min-width:0;height:44px;border-radius:999px;border:1px solid var(--line);background:var(--surface-2);padding:0 16px;font-variant-numeric:tabular-nums;letter-spacing:.08em}
+.cp input:focus{outline:2px solid var(--red);outline-offset:0;border-color:transparent}
+#cpOut{font-size:14px;display:flex;flex-direction:column;gap:6px}
+#cpOut b{font-weight:600}
+.facts{margin-top:16px;display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:16px;font-size:13.5px}
+.facts>div{background:var(--surface);border-radius:22px;padding:20px 22px}
+@media (max-width:760px){.facts{grid-template-columns:1fr;gap:14px}}
+.facts>div{display:flex;gap:12px;align-items:flex-start}
+.facts svg{flex:none;color:var(--red-ink)}
+.facts b{display:block;font-weight:600}
+.facts small{color:var(--muted);font-size:13px}
+
+/* Carrito y compra */
+.pagewrap{padding-block:28px 72px}
+.pagetitle{font-size:clamp(34px,4vw,48px);font-weight:400;letter-spacing:-.03em;margin-bottom:20px}
+.cartlay{display:grid;grid-template-columns:minmax(0,1fr) 360px;gap:16px;align-items:start}
+@media (max-width:860px){.cartlay{grid-template-columns:1fr}}
+.line{display:grid;grid-template-columns:84px minmax(0,1fr) auto;gap:16px;padding:16px 0;border-bottom:1px solid var(--line);align-items:center}
+.line:first-child{padding-top:0}
+.line:last-child{border-bottom:0;padding-bottom:0}
+.line img{width:84px;height:84px;border-radius:14px;display:block;object-fit:contain;background:var(--photo)}
+.line .nm{font-weight:600}
+.line .var{font-size:12.5px;color:var(--muted)}
+.line .ctl{display:flex;gap:14px;align-items:center;margin-top:8px;flex-wrap:wrap}
+.line .step{height:34px}
+.line .amt{font-size:18px;font-weight:600;font-variant-numeric:tabular-nums;text-align:right;white-space:nowrap}
+@media (max-width:480px){.line{grid-template-columns:64px minmax(0,1fr)}.line img{width:64px;height:64px}.line .amt{grid-column:2;text-align:left}}
+.summary{display:flex;flex-direction:column;gap:12px;position:sticky;top:calc(env(safe-area-inset-top,0px) + 90px)}
+.summary h3{font-size:22px;font-weight:500}
+.srow{display:flex;justify-content:space-between;gap:10px;font-variant-numeric:tabular-nums;font-size:14px}
+.srow.total{font-size:20px;font-weight:600;padding-top:12px;border-top:1px solid var(--line)}
+.progress{font-size:12.5px;color:var(--muted)}
+.empty{background:var(--surface);border-radius:22px;padding:44px 24px;text-align:center;display:flex;flex-direction:column;gap:10px;align-items:center}
+.empty h2{font-size:22px;font-weight:500}
+.empty p{color:var(--muted)}
+.colay{display:grid;grid-template-columns:minmax(0,1fr) 380px;gap:16px;align-items:start}
+@media (max-width:860px){.colay{grid-template-columns:1fr}.summary{position:static}}
+.co-main{display:flex;flex-direction:column;gap:16px;min-width:0}
+.fgrid{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+.fgrid .full{grid-column:1/-1}
+@media (max-width:560px){.fgrid{grid-template-columns:1fr}}
+.field{display:flex;flex-direction:column;gap:5px;font-size:13px;font-weight:500;min-width:0}
+.field input,.field select{height:44px;border-radius:12px;border:1px solid var(--line);background:var(--surface);padding:0 12px;font-weight:400;width:100%;font-size:14px}
+.field input:focus,.field select:focus{outline:2px solid var(--red);outline-offset:0;border-color:transparent}
+.hint{font-size:12.5px;color:var(--muted)}
+.radio{display:flex;gap:12px;align-items:flex-start;border:1px solid var(--line);border-radius:16px;padding:14px;cursor:pointer;margin-bottom:10px}
+.radio:last-of-type{margin-bottom:0}
+.radio input{accent-color:var(--red);width:18px;height:18px;margin-top:2px;flex:none}
+.radio:has(input:checked){border-color:var(--red);background:var(--red-soft)}
+.radio .rt{flex:1;min-width:0}
+.radio b{display:block;font-weight:600}
+.radio small{color:var(--muted)}
+.radio .rp{font-weight:600;white-space:nowrap;font-variant-numeric:tabular-nums}
+.mini{display:flex;flex-direction:column;gap:10px;max-height:300px;overflow:auto}
+.mini div{display:grid;grid-template-columns:46px minmax(0,1fr) auto;gap:10px;align-items:center;font-size:13px}
+.mini img{width:46px;height:46px;border-radius:10px;object-fit:contain;background:var(--photo)}
+.mini span{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.done{max-width:640px;margin:0 auto;text-align:center;display:flex;flex-direction:column;gap:14px;align-items:center}
+.done .check{width:76px;height:76px;border-radius:50%;background:var(--red);display:grid;place-items:center}
+.done h1{font-size:34px;font-weight:400;letter-spacing:-.02em}
+.done .order{font-family:var(--f-mono);font-size:14px;color:var(--red-ink);letter-spacing:.06em}
+.done .box{width:100%;text-align:left;border-radius:18px;padding:16px;display:flex;flex-direction:column;gap:10px;background:var(--surface-2)}
+
+/* Pie */
+footer{background:var(--ink);color:var(--on-ink)}
+footer .wrap{padding-block:40px 32px;display:flex;justify-content:space-between;align-items:flex-end;gap:16px;flex-wrap:wrap}
+.foot-word{font-family:var(--f-display);font-weight:600;font-size:clamp(56px,9vw,96px);line-height:.8;letter-spacing:-.06em;color:var(--red)}
+.foot-note{font-size:12.5px;color:var(--on-ink-muted);max-width:46ch}
+
+#toast{position:fixed;left:50%;bottom:calc(20px + env(safe-area-inset-bottom,0px));transform:translate(-50%,20px);background:var(--fg);color:var(--bg);padding:12px 20px;border-radius:999px;font-weight:500;font-size:14px;opacity:0;pointer-events:none;transition:opacity .2s,transform .2s;z-index:40;max-width:calc(100% - 32px);display:flex;gap:14px;align-items:center}
+#toast.show{opacity:1;transform:translate(-50%,0);pointer-events:auto}
+#toast a{color:var(--bg);font-weight:600;text-decoration:underline;white-space:nowrap}
+@media (prefers-reduced-motion: reduce){html{scroll-behavior:auto}*{transition:none!important;animation:none!important}}
+</style>
+</head>
+<body>
+<header class="top" id="top">
+  <div class="wrap top-in">
+    <a class="logo" href="#inicio" aria-label="MANU, ir al inicio">manu<i></i></a>
+    <nav class="nav" id="nav" aria-label="Secciones">
+      <a href="#asiento" data-r="asiento">Asiento</a>
+      <a href="#colores" data-r="colores">Colores</a>
+      <a href="#caracteristicas" data-r="caracteristicas">Características</a>
+      <a href="#caja" data-r="caja">En la caja</a>
+      <a href="#envio" data-r="envio">Envío</a>
+      <a href="#nosotros" data-r="nosotros">Nosotros</a>
+    </nav>
+    <div class="top-actions">
+      <a class="btn sm" href="#comprar">Comprar</a>
+      <a class="cart" href="#carrito" aria-label="Carrito">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="M5 8h14l-1.2 11a2 2 0 0 1-2 1.8H8.2a2 2 0 0 1-2-1.8z"/><path d="M9 8V6.5a3 3 0 0 1 6 0V8"/></svg>
+        <b id="cartCount">0</b>
+      </a>
+    </div>
+  </div>
+</header>
+
+<main id="app"></main>
+
+<footer>
+  <div class="wrap">
+    <div class="foot-word">manu</div>
+    <p class="foot-note">Silla plegable MANU · Prototipo académico. Precio, envíos y pedidos son simulados.</p>
+  </div>
+</footer>
+<div id="toast" role="status" aria-live="polite"></div>
+
+<script>
+(function(){
+const $=s=>document.querySelector(s);
+const app=$('#app');
+const PRICE=1490, STOCK=18, SHIP=149, EXPRESS=249;
+const NAME='Silla plegable MANU';
+const COLORS=[['Rojo vino','#7B3B39','vino'],['Rojo MANU','#D8463C','rojo'],['Grafito','#3F3F41','grafito'],['Arena','#CBBCA6','arena'],['Salvia','#8FA77A','salvia']];
+const money=(n,d=0)=>new Intl.NumberFormat('es-MX',{style:'currency',currency:'MXN',minimumFractionDigits:d,maximumFractionDigits:d}).format(n);
+const esc=s=>String(s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+
+/* ---------- Renders ---------- */
+const pic=n=>`img/${n}.webp`;
+const colorPic=i=>pic('color_'+COLORS[i][2]);
+const GAL=[['color','Color'],['isometrica','Isométrica'],['frontal','Frontal'],['lateral','Lateral'],['trasera','Trasera'],['plegada','Plegada'],['superior','Superior']];
+const ALT={
+  isometrica:'Silla MANU en Rojo MANU, vista isométrica con la agarradera del asiento',
+  frontal:'Silla MANU vista frontal desde abajo, con los postes paralelos, las placas de sujeción y las abrazaderas de bisagra',
+  lateral:'Silla plegable MANU, vista lateral',
+  trasera:'Silla MANU vista trasera, con la estructura tubular de acero cromado',
+  plegada:'Silla MANU plegada, con el asiento levantado junto a los postes',
+  superior:'Asiento en abanico de la silla MANU visto desde arriba, con la agarradera integrada',
+  explotada:'Vista explotada de la silla MANU: asiento, abrazaderas de bisagra, placas de sujeción, tornillería y estructura tubular'
+};
+const galSrc=(i,c)=>i===0?colorPic(c):pic(GAL[i][0]);
+const galAlt=(i,c)=>i===0?`Silla plegable MANU con asiento ${COLORS[c][0]}, vista en perspectiva`:ALT[GAL[i][0]];
+const colorAlt=i=>`Silla plegable MANU con asiento ${COLORS[i][0]}`;
+
+/* ---------- Dibujos planos de la caja ---------- */
+function hx(h){h=h.replace('#','');return[0,2,4].map(i=>parseInt(h.slice(i,i+2),16));}
+function mix(a,b,t){const A=hx(a),B=hx(b);return'#'+A.map((v,i)=>Math.round(v+(B[i]-v)*t).toString(16).padStart(2,'0')).join('');}
+function rng(seed){return function(){seed|=0;seed=seed+0x6D2B79F5|0;let t=Math.imul(seed^seed>>>15,1|seed);t=t+Math.imul(t^t>>>7,61|t)^t;return((t^t>>>14)>>>0)/4294967296;}}
+const MET='#4E494A';
+
+/* ---------- Estado ---------- */
+const sel={color:0,img:0,qty:1};
+let lastOrder=null,curView='';
+let cart=[];
+try{cart=JSON.parse(localStorage.getItem('manu-cart-silla')||'[]')||[];}catch(e){cart=[];}
+cart=cart.filter(l=>COLORS[l.color]);
+const units=()=>cart.reduce((a,l)=>a+l.qty,0);
+function saveCart(){try{localStorage.setItem('manu-cart-silla',JSON.stringify(cart));}catch(e){}$('#cartCount').textContent=units();}
+function etaDate(days){const d=new Date();let n=0;while(n<days){d.setDate(d.getDate()+1);if(d.getDay()!==0&&d.getDay()!==6)n++;}return d;}
+const fmtD=d=>d.toLocaleDateString('es-MX',{weekday:'long',day:'numeric',month:'long'});
+function etaText(days){const d=etaDate(days),t=new Date();t.setDate(t.getDate()+1);return d.toDateString()===t.toDateString()?'mañana':'el '+fmtD(d);}
+function shipCost(kind,n){return kind==='pickup'?0:kind==='exp'?EXPRESS:(n>=2?0:SHIP);}
+function totals(kind){const n=units(),sub=n*PRICE,s=shipCost(kind,n);return{n,sub,s,total:sub+s};}
+const SHIPS={
+  std:{name:'Envío estándar',time:'3 a 5 días hábiles',eta:()=>etaText(5)},
+  exp:{name:'Envío express',time:'1 a 2 días hábiles',eta:()=>etaText(2)},
+  pickup:{name:'Recoger en el taller',time:'Lista al día hábil siguiente',eta:()=>etaText(1)}
+};
+
+const I={
+truck:`<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M3 7h11v9H3zM14 10h4l3 3v3h-7z"/><circle cx="7" cy="17.5" r="1.6"/><circle cx="17.5" cy="17.5" r="1.6"/></svg>`,
+ret:`<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M4 12a8 8 0 1 0 2.4-5.7L4 8.5"/><path d="M4 4v4.5h4.5"/></svg>`,
+shield:`<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3l8 3v6c0 4.5-3.4 8-8 9-4.6-1-8-4.5-8-9V6z"/><path d="m8.5 12 2.5 2.5 4.5-5"/></svg>`,
+box:`<svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M3 7.5 12 3l9 4.5v9L12 21l-9-4.5z"/><path d="M3 7.5 12 12l9-4.5M12 12v9"/></svg>`
+};
+const svgData=s=>'data:image/svg+xml;charset=utf-8,'+encodeURIComponent(`<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 300"><rect width="400" height="300" fill="#ECE8E4"/>${s}</svg>`);
+const BOXIMG={
+  key:svgData(`<path d="M120 200H260V110" stroke="${MET}" stroke-width="16" fill="none" stroke-linecap="round" stroke-linejoin="round"/><text x="200" y="250" font-family="monospace" font-size="18" fill="#776C6B" text-anchor="middle">5 mm</text>`),
+  guide:svgData(`<rect x="130" y="60" width="140" height="180" rx="8" fill="#fff"/><rect x="130" y="60" width="140" height="44" rx="8" fill="#D8352A"/><text x="148" y="90" font-family="sans-serif" font-weight="700" font-size="22" fill="#fff">manu</text>${[124,140,156,172,188].map((y,i)=>`<rect x="148" y="${y}" width="${i%2?80:104}" height="7" rx="3" fill="#D9D3D0"/>`).join('')}<path d="M150 214l14 8 14-16" stroke="#D8352A" stroke-width="5" fill="none" stroke-linecap="round" stroke-linejoin="round"/>`)
+};
+const BOXCHAIR={};
+function boxChair(ci){
+  if(BOXCHAIR[ci])return BOXCHAIR[ci];
+  const u=COLORS[ci][1],ud=mix(u,'#000000',.3),fl=mix(u,'#ffffff',.55);
+  const CH='#C9CDD1',CHL='#F4F6F7',CHD='#A2A8AE',PLT='#B4B9BE';
+  const fan='M0 0H112A112 112 0 0 0 0 -112Z';
+  const r=rng(ci*17+5);let dots='';
+  for(let i=0;i<34;i++){const x=(r()*120).toFixed(1),y=(-r()*120).toFixed(1),rad=(1.4+r()*3.2).toFixed(1);dots+=`<circle cx="${x}" cy="${y}" r="${rad}" fill="${fl}" opacity="${(.45+r()*.4).toFixed(2)}"/>`;}
+  const tube=(x,y,w,h)=>`<rect x="${x}" y="${y}" width="${w}" height="${h}" rx="${w/2}" fill="${CH}"/><rect x="${x+2}" y="${y+5}" width="2.6" height="${h-10}" rx="1.3" fill="${CHL}"/><rect x="${x+w-3}" y="${y+5}" width="2" height="${h-10}" rx="1" fill="${CHD}"/>`;
+  const svg=`<defs><clipPath id="fanc"><path d="${fan}" stroke-linejoin="round"/></clipPath></defs>
+  <ellipse cx="206" cy="276" rx="52" ry="6" fill="#000" opacity=".08"/>
+  <path d="M180 150V256Q180 270 194 270H220Q234 270 234 256V150" stroke="${CH}" stroke-width="9" fill="none" stroke-linecap="round"/>
+  <path d="M182 152V255Q182 268 194 268" stroke="${CHL}" stroke-width="2.4" fill="none" stroke-linecap="round"/>
+  <g transform="translate(192 132) rotate(8) scale(.9)">
+    <path d="${fan}" transform="translate(5 4)" fill="${ud}" stroke="${ud}" stroke-width="14" stroke-linejoin="round"/>
+    <path d="${fan}" fill="${u}" stroke="${u}" stroke-width="14" stroke-linejoin="round"/>
+    <g clip-path="url(#fanc)">${dots}</g>
+    <rect x="-24" y="-7" width="48" height="14" rx="7" fill="#ECE8E4" stroke="${ud}" stroke-width="2" transform="translate(64 -64) rotate(45)"/>
+  </g>
+  ${tube(192,118,10,156)}${tube(210,118,10,156)}
+  <rect x="186" y="128" width="40" height="12" rx="2.5" fill="${PLT}"/><rect x="186" y="128" width="40" height="3" rx="1.5" fill="${CHL}"/>
+  <rect x="186" y="244" width="40" height="12" rx="2.5" fill="${PLT}"/><rect x="186" y="244" width="40" height="3" rx="1.5" fill="${CHL}"/>
+  <circle cx="191" cy="134" r="1.8" fill="${CHD}"/><circle cx="221" cy="134" r="1.8" fill="${CHD}"/><circle cx="191" cy="250" r="1.8" fill="${CHD}"/><circle cx="221" cy="250" r="1.8" fill="${CHD}"/>`;
+  return BOXCHAIR[ci]=svgData(svg);
+}
+
+/* ---------- Página del producto ---------- */
+function viewHome(){
+  const c=sel.color,cn=COLORS[c][0];
+  return `
+  <section class="wrap hero" id="sec-inicio">
+    <h1 class="word"><span>manu</span><small>silla plegable</small></h1>
+    <div class="hero-grid">
+      <div class="hero-copy">
+        <p>Asiento tipo abanico de plástico HDPE 100% reciclado y estructura tubular de acero cromado que se pliega en un solo movimiento.</p>
+        <div class="hero-price"><b>${money(PRICE)}</b><span>6 meses sin intereses de ${money(PRICE/6,2)}</span></div>
+        <div class="hero-btns"><a class="btn" href="#comprar">Comprar</a><a class="btn ghost" href="#colores">Ver colores</a></div>
+      </div>
+      <div class="hero-chair"><img src="${pic('lateral')}" alt="Silla plegable MANU, vista lateral" width="1200" height="1200"></div>
+      <div class="hero-cards">
+        <a class="hcard" href="#asiento"><img src="${pic('superior')}" alt="Asiento de la silla MANU visto desde arriba"><span>Plástico reciclado →</span></a>
+        <a class="hcard" href="#despiece"><img src="${pic('plegada')}" alt="Silla MANU plegada"><span>Plegada: 6 cm →</span></a>
+      </div>
+    </div>
+  </section>
+
+  <section class="wrap sec" id="sec-asiento" style="padding-bottom:16px">
+    <div class="sec-head"><h2><span>El asiento</span>hecho con lo que ya existe</h2><span class="idx">01/ Material</span></div>
+    <div class="seat">
+      <div class="tile"><img src="${pic('superior')}" alt="${ALT.superior}"></div>
+      <div class="seat-side">
+        <p class="lead">El asiento de MANU es una sola pieza tipo abanico de plástico HDPE reciclado post-consumo. Viene de envases de leche, detergente y shampoo.</p>
+        <div class="stats">
+          <div class="stat"><b>100%</b><span>HDPE reciclado post-consumo</span></div>
+          <div class="stat"><b>1.8 kg</b><span>de plástico recuperado por asiento</span></div>
+          <div class="stat"><b>≈ 45</b><span>envases de 1 litro</span></div>
+          <div class="stat"><b>0</b><span>barniz, pintura o químicos de mantenimiento</span></div>
+        </div>
+        <ul class="checks">
+          <li>Esquinas redondeadas y borde posterior curvo.</li>
+          <li>Agarradera integrada para cargarla o colgarla.</li>
+          <li>12 mm de espesor, acabado mate texturizado y color propio del material.</li>
+          <li>Resiste humedad, rayos UV y manchas, en interior y exterior.</li>
+          <li>Al final de su vida útil, el asiento se puede reciclar de nuevo.</li>
+        </ul>
+      </div>
+    </div>
+  </section>
+
+  <section class="wrap" id="sec-ventajas">
+    <div class="vgrid">
+      <div class="vcard"><span class="mono">01</span><h3>Uso flexible</h3><p>Sirve en interior y exterior. Resiste humedad, rayos UV y manchas, y se limpia con agua y jabón neutro.</p></div>
+      <div class="vcard"><span class="mono">02</span><h3>Ahorro de espacio</h3><p>Se pliega en un solo movimiento y queda de 6 cm de grosor. Con la agarradera se carga o se cuelga.</p></div>
+      <div class="vcard"><span class="mono">03</span><h3>Material recuperado</h3><p>Cada asiento usa 1.8 kg de HDPE post-consumo, unos 45 envases de 1 litro, y se puede reciclar de nuevo.</p></div>
+    </div>
+  </section>
+
+  <section class="band" id="sec-colores">
+    <div class="wrap sec">
+      <div class="sec-head"><h2><span>Un material,</span> cinco colores</h2><span class="idx">02/ Colores</span></div>
+      <div class="colors">${COLORS.map((k,i)=>`<button class="ctile ${i===c?'on':''}" data-act="color" data-v="${i}" aria-pressed="${i===c}"><img src="${colorPic(i)}" alt="${colorAlt(i)}" loading="lazy"><span class="cname"><i style="background:${k[1]}"></i>${k[0]}</span><span class="cmeta">${i===c?'Seleccionado':'HDPE reciclado · mate'}</span></button>`).join('')}</div>
+      <p class="band-note">El color es propio del plástico reciclado, sin pintura. La estructura es de acero cromado en todos los colores.</p>
+    </div>
+  </section>
+
+  <section class="wrap sec" id="sec-comprar">
+    <div class="sec-head"><h2><span>Elige tu color</span>y llévala a casa</h2><span class="idx">03/ Comprar</span></div>
+    <div class="pdp">
+      <div class="gal">
+        <div class="main-img"><img src="${galSrc(sel.img,c)}" alt="${galAlt(sel.img,c)}"></div>
+        <div class="thumbs">${GAL.map(([k,lbl],i)=>`<button class="thumb ${i===sel.img?'on':''}" data-act="thumb" data-v="${i}" aria-label="Vista ${lbl}" aria-pressed="${i===sel.img}"><img src="${galSrc(i,c)}" alt="" loading="lazy"><small>${lbl}</small></button>`).join('')}</div>
+        <p class="note">Vistas de detalle mostradas en Rojo MANU</p>
+      </div>
+      <div class="buy">
+        <span class="mono muted">Silla plegable · Interior y exterior</span>
+        <h2>${NAME}</h2>
+        <p class="tagline">Plegado en un solo movimiento y asiento de plástico 100% reciclado.</p>
+        <div class="bigprice"><span class="price">${money(PRICE)}</span><span class="msi">6 meses sin intereses de ${money(PRICE/6,2)}</span></div>
+        <div class="opt"><h4>Color del asiento: <b>${cn}</b></h4>
+          <div class="sw">${COLORS.map((k,i)=>`<button class="${i===c?'on':''}" data-act="color" data-v="${i}" aria-label="${k[0]}" aria-pressed="${i===c}"><i style="background:${k[1]}"></i></button>`).join('')}</div></div>
+        <div class="qtyrow"><span class="step"><button data-act="qty" data-v="-1" aria-label="Quitar una" ${sel.qty<=1?'disabled':''}>−</button><span>${sel.qty}</span><button data-act="qty" data-v="1" aria-label="Agregar una" ${sel.qty>=8?'disabled':''}>+</button></span><span class="muted">${STOCK} disponibles · envío gratis desde 2 sillas</span></div>
+        <div class="actions"><button class="btn" data-act="buynow">Comprar ahora</button><button class="btn ghost" data-act="addcart">Agregar al carrito</button></div>
+        <div class="perks">
+          <div class="perk">${I.truck}<div><b class="ok">Llega ${etaText(5)} con envío estándar</b><small>${money(SHIP)}, o gratis desde 2 sillas. Express en 1 a 2 días por ${money(EXPRESS)}.</small></div></div>
+          <div class="perk">${I.ret}<div><b>30 días para devolverla</b><small>Si no te convence, la recogemos sin costo.</small></div></div>
+          <div class="perk">${I.shield}<div><b>Garantía de 2 años</b><small>2 años en estructura y 1 año en asiento.</small></div></div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="wrap" id="sec-despiece">
+    <div class="exp" aria-label="Despiece de la silla">
+      <div class="exp-head"><span class="brandline">Manu</span><span class="mono">Despiece</span></div>
+      <div class="exp-grid">
+        <div class="views">
+          <ol class="parts">
+            <li><span>01</span><div><b>Asiento de HDPE</b><small>Reciclado, 12 mm de espesor</small></div></li>
+            <li><span>02</span><div><b>Abrazaderas de bisagra</b><small>Bajo el asiento</small></div></li>
+            <li><span>03</span><div><b>Placas de sujeción</b><small>Acero de 3 mm, superior e inferior</small></div></li>
+            <li><span>04</span><div><b>Tornillería</b></div></li>
+            <li><span>05</span><div><b>Estructura tubular</b><small>Acero cromado Ø 22 mm</small></div></li>
+          </ol>
+          <div class="dims">Al 780 mm · An 450 mm<br>Pr 450 mm · Plegada 60 mm</div>
+        </div>
+        <div class="exp-body">
+          <h2 class="exp-title">MANU<small>Silla plegable</small></h2>
+          <p class="callout"><span><b>Asiento en abanico</b> que se abate sobre la estructura en <b>un solo movimiento</b></span></p>
+          <p class="materials"><b>Materiales:</b>HDPE reciclado, acero cromado</p>
+        </div>
+        <div class="exp-big"><img src="${pic('explotada')}" alt="${ALT.explotada}"></div>
+      </div>
+    </div>
+  </section>
+
+  <section class="wrap sec" id="sec-caracteristicas">
+    <div class="sec-head"><h2><span>Características</span>y ficha técnica</h2><span class="idx">04/ Detalle</span></div>
+    <div class="two">
+      <div class="panel"><h3>Lo que la hace distinta</h3>
+        <ul class="feats">
+          ${[['Asiento en abanico','Una sola pieza de HDPE reciclado, con esquinas redondeadas y borde posterior curvo.'],
+             ['Plegado rápido','El asiento se abate sobre la estructura en un solo movimiento y la silla queda de 6 cm de grosor.'],
+             ['Agarradera integrada','Ranura en el propio asiento para cargarla o colgarla.'],
+             ['Estructura de acero cromado','Dos postes paralelos con placas de refuerzo y un arco tubular de una sola pieza, en tubo de Ø 22 mm.'],
+             ['Interior y exterior','Resiste humedad, rayos UV y manchas.'],
+             ['Bajo mantenimiento','Se limpia con agua y jabón neutro, sin barniz ni pintura.']].map(([t,d],i)=>`<li><span>0${i+1}</span><div><b>${t}</b><small>${d}</small></div></li>`).join('')}
+        </ul></div>
+      <div class="panel"><h3>Ficha técnica</h3>
+        <div style="overflow-x:auto"><table class="specs"><tbody>
+          ${[['Modelo','MANU · SKU MANU-01'],['Tipo','Silla plegable'],['Material del asiento','HDPE reciclado post-consumo, 100% contenido reciclado'],['Forma del asiento','Una sola pieza tipo abanico, esquinas redondeadas, borde posterior curvo y agarradera integrada'],['Acabado del asiento','Mate texturizado, color propio del material'],['Espesor del asiento','12 mm'],['Estructura','Tubo de acero cromado'],['Diámetro del tubo','Ø 22 mm'],['Placas de sujeción','Acero, 3 mm'],['Medidas abierta (al × an × pr)','78 × 45 × 45 cm'],['Medidas plegada','78 × 45 × 6 cm'],['Altura del asiento','45 cm'],['Peso','3.8 kg'],['Carga máxima','En pruebas'],['Uso','Interior y exterior: humedad, rayos UV y manchas'],['Ensamble','Llega armada, solo se despliega'],['Garantía','2 años en estructura, 1 año en asiento']].map(([k,v])=>`<tr><th>${k}</th><td>${v}</td></tr>`).join('')}
+        </tbody></table></div>
+      </div>
+    </div>
+  </section>
+
+  <section class="wrap sec" id="sec-caja" style="padding-top:0">
+    <div class="sec-head"><h2><span>Qué viene</span>en la caja</h2><span class="idx">05/ Contenido</span></div>
+    <div class="box-grid">
+      <div class="bitem"><div class="bimg"><img src="${boxChair(c)}" alt="Dibujo de la silla MANU plegada, con el asiento ${cn} levantado junto a los postes"></div><span class="qty">1 ×</span><b>Silla MANU</b><small>Llega armada y plegada, lista para abrirse.</small></div>
+      <div class="bitem"><div class="bimg"><img src="${BOXIMG.key}" alt="Llave Allen"></div><span class="qty">1 ×</span><b>Llave Allen de 5 mm</b><small>Para ajustar la tornillería de las placas.</small></div>
+      <div class="bitem"><div class="bimg"><img src="${BOXIMG.guide}" alt="Guía de uso"></div><span class="qty">1 ×</span><b>Guía de uso y cuidados</b><small>Cómo abrirla, plegarla y mantenerla.</small></div>
+    </div>
+    <div class="care panel">
+      <h3>Cuidados</h3>
+      <ul>
+        <li>Limpia con un paño húmedo, agua y jabón neutro.</li>
+        <li>Evita solventes y limpiadores abrasivos.</li>
+        <li>Si la usas en exterior, revisa y aprieta la tornillería cada 6 meses.</li>
+        <li>No te pares sobre el asiento ni la uses como escalón.</li>
+      </ul>
+    </div>
+  </section>
+
+  <section class="wrap sec" id="sec-envio" style="padding-top:0">
+    <div class="sec-head"><h2><span>Tiempos y costos</span>de envío</h2><span class="idx">06/ Envío</span></div>
+    <div class="ship-grid">
+      <div class="sopt"><span class="mono">Todo México</span><h3>Estándar</h3><span class="cost">${money(SHIP)}</span><span class="time">3 a 5 días hábiles</span><p>Gratis al comprar 2 sillas o más.</p></div>
+      <div class="sopt"><span class="mono">Monterrey, CDMX y Guadalajara</span><h3>Express</h3><span class="cost">${money(EXPRESS)}</span><span class="time">1 a 2 días hábiles</span><p>Disponible en las zonas metropolitanas.</p></div>
+      <div class="sopt"><span class="mono">Taller en Monterrey</span><h3>Recoger en el taller</h3><span class="cost free">Gratis</span><span class="time">Lista al día hábil siguiente</span><p>Te avisamos cuando esté lista.</p></div>
+    </div>
+    <div class="estimator">
+      <div><h3>¿Cuándo te llega?</h3>
+        <label class="cp"><input id="cpIn" inputmode="numeric" maxlength="5" placeholder="Código postal" aria-label="Código postal" value="64000"></label></div>
+      <div id="cpOut"></div>
+    </div>
+    <div class="facts">
+      <div>${I.ret}<div><b>30 días para devolver</b><small>La recogemos sin costo si llega en buen estado.</small></div></div>
+      <div>${I.shield}<div><b>Garantía de 2 años</b><small>En estructura; 1 año en asiento.</small></div></div>
+    </div>
+  </section>
+
+  <section class="wrap sec" id="sec-nosotros" style="padding-top:0">
+    <div class="sec-head"><h2><span>Diseño simple</span>para espacios con carácter</h2><span class="idx">07/ Nosotros</span></div>
+    <div class="about">
+      <div class="tile big"><img src="${pic('isometrica')}" alt="${ALT.isometrica}" loading="lazy"></div>
+      <div class="about-side">
+        <div class="tile"><img src="${pic('frontal')}" alt="${ALT.frontal}" loading="lazy"></div>
+        <p class="quote">Diseñar también es volver a dar valor.</p>
+        <p>MANU transforma plástico HDPE post-consumo en un asiento funcional y lo integra a una estructura plegable de acero.</p>
+        <p>El proyecto demuestra cómo una decisión de material, una solución estructural y una necesidad de uso pueden integrarse en un solo producto.</p>
+      </div>
+    </div>
+    <h3 class="team-title">El equipo</h3>
+    <div class="team">
+      ${[['Andrés Camacho León','andres'],['Adela Josefina Domínguez Hernández','adela'],['Ariana Karina García Ruíz','ariana']].map(([n,f])=>`<figure class="member"><div class="photo"><img src="${pic('equipo_'+f)}" alt="Retrato de ${n}" loading="lazy" width="800" height="800"></div><figcaption><b>${n}</b><small>Cofundador(a) de MANU</small></figcaption></figure>`).join('')}
+    </div>
+  </section>`;
+}
+function cpResult(cp){
+  if(!/^\d{5}$/.test(cp))return '<span class="muted">Escribe tus 5 dígitos para ver la fecha estimada.</span>';
+  let zone='Resto de México',exp=false;
+  if(/^6[4-7]/.test(cp)){zone='Monterrey y área metropolitana';exp=true;}
+  else if(/^(0|1[0-6])/.test(cp)){zone='Ciudad de México';exp=true;}
+  else if(/^4[45]/.test(cp)){zone='Guadalajara y área metropolitana';exp=true;}
+  return `<span class="mono muted">${zone}</span>
+    <span>Estándar: llega <b>${etaText(5)}</b></span>
+    ${exp?`<span>Express: llega <b>${etaText(2)}</b></span>`:'<span class="muted">Express no disponible en esta zona.</span>'}`;
+}
+
+/* ---------- Carrito y compra ---------- */
+function cartLines(){
+  return cart.map((l,i)=>`<div class="line">
+    <img src="${colorPic(l.color)}" alt="${colorAlt(l.color)}">
+    <div style="min-width:0"><span class="nm">${NAME}</span>
+      <div class="var">Asiento ${COLORS[l.color][0]} · estructura de acero cromado</div>
+      <div class="ctl"><span class="step"><button data-act="dec" data-i="${i}" aria-label="Quitar una unidad" ${l.qty<=1?'disabled':''}>−</button><span>${l.qty}</span><button data-act="inc" data-i="${i}" aria-label="Agregar una unidad" ${l.qty>=8?'disabled':''}>+</button></span>
+      <button class="link" data-act="rm" data-i="${i}">Eliminar</button></div></div>
+    <div class="amt">${money(PRICE*l.qty)}</div></div>`).join('');
+}
+function viewCart(){
+  if(!cart.length)return `<div class="wrap pagewrap"><h1 class="pagetitle">Carrito</h1><div class="empty"><h2>Tu carrito está vacío</h2><p>Elige un color y agrega tu silla MANU.</p><a class="btn" href="#comprar">Elegir color</a></div></div>`;
+  const t=totals('std');
+  return `<div class="wrap pagewrap"><h1 class="pagetitle">Carrito</h1>
+  <div class="cartlay">
+    <section class="panel">${cartLines()}</section>
+    <aside class="panel summary"><h3>Resumen</h3>
+      <div class="srow"><span>Sillas (${t.n})</span><span>${money(t.sub)}</span></div>
+      <div class="srow"><span>Envío estándar</span><span class="${t.s?'':'ok'}">${t.s?money(t.s):'Gratis'}</span></div>
+      ${t.n<2?`<div class="progress">Agrega otra silla y el envío estándar es gratis.</div>`:`<div class="progress ok">Tu compra tiene envío estándar gratis.</div>`}
+      <div class="srow total"><span>Total</span><span>${money(t.total)}</span></div>
+      <a class="btn block" href="#checkout">Continuar compra</a>
+      <a class="link" href="#comprar" style="text-align:center">Agregar otro color</a>
+    </aside>
+  </div></div>`;
+}
+const ESTADOS=['Aguascalientes','Baja California','Chihuahua','Ciudad de México','Coahuila','Estado de México','Guanajuato','Jalisco','Nuevo León','Puebla','Querétaro','Quintana Roo','San Luis Potosí','Sonora','Tamaulipas','Veracruz','Yucatán'];
+function coTotalsHTML(kind){const t=totals(kind);
+  return `<div class="srow"><span>Sillas (${t.n})</span><span>${money(t.sub)}</span></div>
+    <div class="srow"><span>${SHIPS[kind].name}</span><span class="${t.s?'':'ok'}">${t.s?money(t.s):'Gratis'}</span></div>
+    <div class="srow total"><span>Total</span><span>${money(t.total)}</span></div>
+    <div class="msi">Hasta 6 meses sin intereses de ${money(t.total/6,2)}</div>`;}
+function viewCheckout(){
+  if(!cart.length)return viewCart();const n=units();
+  return `<div class="wrap pagewrap"><h1 class="pagetitle">Finalizar compra</h1>
+  <form class="colay" id="coForm">
+    <div class="co-main">
+      <section class="panel"><h3>Dirección de entrega</h3>
+        <div class="fgrid">
+          <label class="field">Nombre y apellido<input id="coName" required autocomplete="name" placeholder="Ej. Ana López"></label>
+          <label class="field">Teléfono (10 dígitos)<input id="coTel" required inputmode="numeric" pattern="[0-9]{10}" maxlength="10" autocomplete="tel" placeholder="8112345678"></label>
+          <label class="field full">Calle y número<input id="coStreet" required autocomplete="street-address" placeholder="Ej. Av. Constitución 1500"></label>
+          <label class="field">Colonia<input id="coCol" required placeholder="Ej. Centro"></label>
+          <label class="field">Código postal<input id="coCP" required inputmode="numeric" pattern="[0-9]{5}" maxlength="5" value="64000"></label>
+          <label class="field">Ciudad<input id="coCity" required value="Monterrey"></label>
+          <label class="field">Estado<select id="coState">${ESTADOS.map(e=>`<option ${e==='Nuevo León'?'selected':''}>${e}</option>`).join('')}</select></label>
+        </div></section>
+      <section class="panel"><h3>Forma de entrega</h3>
+        ${['std','exp','pickup'].map((k,i)=>{const cst=shipCost(k,n);return `<label class="radio"><input type="radio" name="ship" value="${k}" ${i?'':'checked'}><span class="rt"><b>${SHIPS[k].name}</b><small>${SHIPS[k].time} · ${k==='pickup'?'lista':'llega'} ${SHIPS[k].eta()}</small></span><span class="rp ${cst?'':'ok'}">${cst?money(cst):'Gratis'}</span></label>`;}).join('')}
+      </section>
+      <section class="panel"><h3>Forma de pago</h3>
+        <label class="radio"><input type="radio" name="pay" value="Tarjeta de crédito o débito" checked><span class="rt"><b>Tarjeta de crédito o débito</b><small>Hasta 6 meses sin intereses con tarjetas participantes.</small></span></label>
+        <label class="radio"><input type="radio" name="pay" value="Efectivo en tienda de conveniencia"><span class="rt"><b>Efectivo en tienda de conveniencia</b><small>Recibes una referencia para pagar en 48 horas.</small></span></label>
+        <label class="radio"><input type="radio" name="pay" value="Transferencia SPEI"><span class="rt"><b>Transferencia SPEI</b><small>Se acredita en minutos.</small></span></label>
+        <p class="hint" style="margin-top:12px">Pago simulado: no se piden datos de tarjeta ni se realiza ningún cobro.</p>
+      </section>
+    </div>
+    <aside class="panel summary"><h3>Tu pedido</h3>
+      <div class="mini">${cart.map(l=>`<div><img src="${colorPic(l.color)}" alt="${colorAlt(l.color)}"><span>${l.qty} × MANU ${COLORS[l.color][0]}</span><b class="num">${money(PRICE*l.qty)}</b></div>`).join('')}</div>
+      <div id="coTotals" style="display:flex;flex-direction:column;gap:12px">${coTotalsHTML('std')}</div>
+      <button class="btn block" type="submit">Confirmar compra</button>
+      <a class="link" href="#carrito" style="text-align:center">Modificar carrito</a>
+    </aside>
+  </form></div>`;
+}
+function viewDone(){
+  const o=lastOrder;
+  return `<div class="wrap pagewrap"><section class="panel done">
+    <div class="check"><svg width="36" height="36" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="m5 12.5 4.5 4.5L19 7.5"/></svg></div>
+    <h1>Tu compra quedó confirmada</h1>
+    <div class="order">Pedido ${o.num}</div>
+    <p class="muted">Esto es una simulación: no se realizó ningún cobro ni se enviará ningún producto.</p>
+    <div class="box">
+      <div class="perk" style="border:0;padding:0">${I.truck}<div><b class="ok">${o.ship==='pickup'?'Lista para recoger':'Llega'} ${o.eta}</b><small>${esc(o.addr)}</small></div></div>
+      <div class="mini">${o.items.map(l=>`<div><img src="${colorPic(l.color)}" alt="${colorAlt(l.color)}"><span>${l.qty} × MANU ${COLORS[l.color][0]}</span><b class="num">${money(PRICE*l.qty)}</b></div>`).join('')}</div>
+      <div class="srow"><span>Pago</span><span>${esc(o.pay)}</span></div>
+      <div class="srow total"><span>Total</span><span>${money(o.total)}</span></div>
+    </div>
+    <a class="btn dark" href="#inicio">Volver a MANU</a>
+  </section></div>`;
+}
+
+/* ---------- Navegación ---------- */
+const SECS=['','inicio','asiento','colores','comprar','despiece','caracteristicas','caja','envio','nosotros'];
+const route=()=>(location.hash||'').replace(/^#/,'');
+function draw(){
+  const r=route();
+  let view='home';
+  if(r==='carrito')view='carrito';else if(r==='checkout')view='checkout';else if(r==='pedido'&&lastOrder)view='pedido';
+  if(view==='home'){app.innerHTML=viewHome();const o=$('#cpOut'),i=$('#cpIn');if(o&&i)o.innerHTML=cpResult(i.value);}
+  else app.innerHTML=view==='carrito'?viewCart():view==='checkout'?viewCheckout():viewDone();
+  curView=view;
+  document.querySelectorAll('#nav a').forEach(a=>a.classList.toggle('on',a.dataset.r===r));
+}
+function onRoute(){
+  const r=route(),wasHome=curView==='home';
+  const isHome=SECS.includes(r)||!['carrito','checkout','pedido'].includes(r);
+  if(!(wasHome&&isHome))draw();else document.querySelectorAll('#nav a').forEach(a=>a.classList.toggle('on',a.dataset.r===r));
+  const el=isHome&&r&&r!=='inicio'?document.getElementById('sec-'+r):null;
+  if(el)el.scrollIntoView({block:'start'});else window.scrollTo(0,0);
+}
+function go(h){if(location.hash===h)onRoute();else location.hash=h;}
+window.addEventListener('hashchange',onRoute);
+window.addEventListener('scroll',()=>$('#top').classList.toggle('scrolled',window.scrollY>8),{passive:true});
+
+let toastT;
+function toast(msg,link){const t=$('#toast');t.innerHTML=`<span>${msg}</span>${link||''}`;t.classList.add('show');clearTimeout(toastT);toastT=setTimeout(()=>t.classList.remove('show'),2800);}
+function addToCart(){
+  const ex=cart.find(l=>l.color===sel.color);
+  if(ex)ex.qty=Math.min(8,ex.qty+sel.qty);else cart.push({color:sel.color,qty:sel.qty});saveCart();
+}
+
+document.addEventListener('click',e=>{
+  const b=e.target.closest('[data-act]');if(!b)return;
+  const a=b.dataset.act,v=b.dataset.v;
+  if(a==='color'){sel.color=+v;draw();}
+  else if(a==='thumb'){sel.img=+v;draw();}
+  else if(a==='qty'){sel.qty=Math.min(8,Math.max(1,sel.qty+ +v));draw();}
+  else if(a==='addcart'){addToCart();toast(`Agregaste MANU ${COLORS[sel.color][0]} al carrito`,'<a href="#carrito">Ver carrito</a>');}
+  else if(a==='buynow'){addToCart();go('#checkout');}
+  else if(a==='inc'||a==='dec'){const l=cart[+b.dataset.i];l.qty=Math.min(8,Math.max(1,l.qty+(a==='inc'?1:-1)));saveCart();draw();}
+  else if(a==='rm'){cart.splice(+b.dataset.i,1);saveCart();draw();toast('Eliminaste la silla del carrito');}
+});
+document.addEventListener('input',e=>{if(e.target.id==='cpIn'){e.target.value=e.target.value.replace(/\D/g,'');$('#cpOut').innerHTML=cpResult(e.target.value);}});
+document.addEventListener('change',e=>{if(e.target.name==='ship')$('#coTotals').innerHTML=coTotalsHTML(e.target.value);});
+document.addEventListener('submit',e=>{
+  const f=e.target;e.preventDefault();
+  if(f.id==='coForm'){
+    const ship=f.querySelector('input[name=ship]:checked').value,t=totals(ship);
+    lastOrder={num:'MANU-'+String(Math.floor(100000+Math.random()*900000)),items:cart.slice(),total:t.total,ship,pay:f.querySelector('input[name=pay]:checked').value,
+      eta:SHIPS[ship].eta(),addr:ship==='pickup'?'Taller MANU, Monterrey, Nuevo León':`${$('#coName').value}, ${$('#coStreet').value}, ${$('#coCol').value}, ${$('#coCP').value} ${$('#coCity').value}, ${$('#coState').value}`};
+    cart=[];saveCart();go('#pedido');
+  }
+});
+
+saveCart();
+onRoute();
+})();
+</script>
+</body>
+</html>
